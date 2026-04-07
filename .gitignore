@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+venv/
+.env
+
+# ML stuff
+data/
+datasets/
+models/
+*.pt
+*.pth
+*.h5
+*.ckptgit rm -r --cached 
