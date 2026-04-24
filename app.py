@@ -36,28 +36,27 @@ if user_input:
 
     # ── Attention heatmap ─────────────────────────────────
     if attention is not None:
-     st.subheader("Attention weights")
-    try:
-        gen_tokens = response.split() if response.strip() else ["<response>"]
-        attn = attention[0].mean(dim=0).cpu().detach().numpy()
+        st.subheader("Attention weights")   # ← inside the if block
+        try:
+            gen_tokens = response.split() if response.strip() else ["<response>"]
+            attn = attention[0].mean(dim=0).cpu().detach().numpy()
 
-        # make sure sizes match before plotting
-        min_rows = min(attn.shape[0], len(gen_tokens))
-        min_cols = min(attn.shape[1], len(tokens))
-        attn = attn[:min_rows, :min_cols]
-        gen_tokens = gen_tokens[:min_rows]
-        tokens_trimmed = tokens[:min_cols]
+            min_rows = min(attn.shape[0], len(gen_tokens))
+            min_cols = min(attn.shape[1], len(tokens))
+            attn = attn[:min_rows, :min_cols]
+            gen_tokens = gen_tokens[:min_rows]
+            tokens_trimmed = tokens[:min_cols]
 
-        fig, ax = plt.subplots(figsize=(max(4, len(tokens_trimmed)), max(3, len(gen_tokens))))
-        sns.heatmap(attn, xticklabels=tokens_trimmed, yticklabels=gen_tokens,
-                    cmap="YlOrRd", ax=ax, linewidths=0.5)
-        ax.set_xlabel("Input tokens")
-        ax.set_ylabel("Output tokens")
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close(fig)
-    except Exception as e:
-        st.info(f"Attention map unavailable: {e}")
+            fig, ax = plt.subplots(figsize=(max(4, len(tokens_trimmed)), max(3, len(gen_tokens))))
+            sns.heatmap(attn, xticklabels=tokens_trimmed, yticklabels=gen_tokens,
+                        cmap="YlOrRd", ax=ax, linewidths=0.5)
+            ax.set_xlabel("Input tokens")
+            ax.set_ylabel("Output tokens")
+            plt.tight_layout()
+            st.pyplot(fig)
+            plt.close(fig)
+        except Exception as e:
+            st.info(f"Attention map unavailable: {e}")
 
 # ── Chat history ──────────────────────────────────────────
 st.subheader("Conversation")
