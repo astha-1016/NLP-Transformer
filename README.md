@@ -54,10 +54,25 @@ Trained on the Cornell Movie Dialogs corpus and deployed with Streamlit.
 > but BLEU penalizes diversity — a known limitation of the metric.  
 > A semantic metric like BERTScore would be more appropriate for dialog evaluation.
 
+## Evaluation
+
+The model is evaluated using BLEU-1, BLEU-2, and BLEU-4 scores on held-out test pairs.
+
+| Metric | Score |
+|--------|-------|
+| BLEU-1 | x.xx  |
+| BLEU-2 | x.xx  |
+| BLEU-4 | x.xx  |
+
+> **Note:** BLEU is a weak metric for dialogue systems. A response can be 
+> perfectly valid but phrased differently from the reference, scoring near 
+> zero unfairly. Human evaluation or perplexity would be more meaningful 
+> metrics for conversational AI.
+
+
 ## Limitations and what would improve it
 - 2,000 training pairs is too small for generalization
 - Increasing to 50,000+ pairs would significantly improve responses
-- Beam search decoding would improve response quality over nucleus sampling
 - BERTScore would be a better evaluation metric than BLEU for dialog
 
 ## Run locally
@@ -104,3 +119,4 @@ accelerate
 - Vaswani et al. (2017) — Attention Is All You Need
 - Danescu-Niculescu-Mizil & Lee (2011) — Cornell Movie Dialogs Corpus
 - Radford et al. (2019) — GPT-2: Language Models are Unsupervised Multitask Learners
+

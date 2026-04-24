@@ -32,3 +32,37 @@ def predict(sentence, model, vocab, device, max_len=25):
 
     response = vocab.decode(generated[1:])
     return response, last_attention, tokens
+
+
+def predict_beam(sentence, model, vocab, device, beam_width=3, max_len=25):
+    model.eval()
+    source = torch.tensor([vocab.encode(sentence)]).to(device)
+    
+    beams = [([1], 0.0)]
+    completed = []
+
+    with torch.no_grad():
+        for _ in range(max_len):
+            new_beams = []
+            for seq, score in beams:
+                target = torch.tensor([seq]).to(device)
+                pred, _ = model(source, target)
+                logits = pred[:, -1]
+                log_probs = torch.log_softmax(logits, dim=-1)[0]
+
+                top_probs, top_ids = torch.topk(log_probs, beam_width)
+                for prob, idx in zip(top_probs, top_ids):
+                    new_seq = seq + [idx.item()]
+                    new_score = score + prob.item()
+                    if idx.item() == 2:
+                        completed.append((new_seq, new_score))
+                    else:
+                        new_beams.append((new_seq, new_score))
+
+            beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_width]
+            if not beams:
+                break
+
+    all_candidates = completed if completed else beams
+    best_seq, _ = max(all_candidates, key=lambda x: x[1])
+    return vocab.decode(best_seq[1:])

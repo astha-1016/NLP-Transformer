@@ -3,7 +3,7 @@ import pickle
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.inference import predict
+from utils.inference import predict, predict_beam  # ← added predict_beam
 
 # ── Load model ────────────────────────────────────────────
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,16 +27,26 @@ st.caption("Seq2seq transformer built from scratch · Trained on Cornell Movie D
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
+# ── NEW: Decoding mode selector ───────────────────────────
+mode = st.radio("Decoding mode:", ["Nucleus Sampling", "Beam Search"], horizontal=True)
+
 user_input = st.text_input("You:", key="input")
 
 if user_input:
-    response, attention, tokens = predict(user_input, model, vocab, device)
+    # ── NEW: Choose decoding based on mode ────────────────
+    if mode == "Beam Search":
+        response = predict_beam(user_input, model, vocab, device)
+        attention = None
+        tokens = user_input.split()
+    else:
+        response, attention, tokens = predict(user_input, model, vocab, device)
+
     st.session_state.chat.append(("You", user_input))
     st.session_state.chat.append(("Bot", response))
 
-    # ── Attention heatmap ─────────────────────────────────
+    # ── Attention heatmap (only for Nucleus Sampling) ─────
     if attention is not None:
-        st.subheader("Attention weights")   # ← inside the if block
+        st.subheader("Attention weights")  # ← fixed indent
         try:
             gen_tokens = response.split() if response.strip() else ["<response>"]
             attn = attention[0].mean(dim=0).cpu().detach().numpy()

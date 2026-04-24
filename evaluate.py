@@ -41,3 +41,10 @@ bleu4 = corpus_bleu(references, hypotheses,
 print(f"\nBLEU-1: {bleu1:.4f}")
 print(f"BLEU-2: {bleu2:.4f}")
 print(f"BLEU-4 (smoothed): {bleu4:.4f}")
+
+avg_pred_len = sum(len(h) for h in hypotheses) / len(hypotheses)
+avg_ref_len  = sum(len(r[0]) for r in references) / len(references)
+
+print(f"\nAvg predicted length : {avg_pred_len:.1f} tokens")
+print(f"Avg reference length : {avg_ref_len:.1f} tokens")
+print("\nNote: BLEU is weak for dialogue — low scores don't mean bad responses.")
